@@ -82,7 +82,7 @@ global class RESTDataSourceConnection extends DataSource.Connection {
      **/
     override global DataSource.TableResult query(DataSource.QueryContext context) {
              
-        System.Debug('JVD Pega Query');
+        System.Debug('JVD Query');
         List<Map<String,Object>> rows = execQuery(context);
             
         return DataSource.TableResult.get(context,rows);     
@@ -100,7 +100,7 @@ global class RESTDataSourceConnection extends DataSource.Connection {
      *   requested to be searched.
      **/
     override global List<DataSource.TableResult> search(DataSource.SearchContext context) {        
-        System.Debug('JVD Pega Search By Name');
+        System.Debug('JVD Search By Name');
         return DataSource.SearchUtils.searchByName(context, this);
     }
   
@@ -109,204 +109,174 @@ global class RESTDataSourceConnection extends DataSource.Connection {
             
          List<Map<String,Object>> rows = new List<Map<String,Object>>();
        
-         System.Debug('JVD PegaDataSourceConnection.execQuery');
+         System.Debug('JVD RESTDataSourceConnection.execQuery');
          System.Debug('JVD Table requested: ' + context.tableSelection.tableSelected);
          System.Debug('JVD Filter' + context.tableSelection.filter);
-            
+         String RecordIdentifierName;
+         String RecordIdentifierValue;
+          
          Map<String,Object> outboundContentMap = new Map<String,Object>();
               
          if (context.tableSelection.filter != null)
          {
-             Integration_Definition__c ID = [select Id, Name, URL_Method__c, Object__c, Integration_User__c, Collection_Name__c, Integration_Target__r.Name, Integration_Target__r.Integration_User__c, Integration_Target__r.Named_Credentials__c, Integration_Target__r.User_Field_Name__c  from Integration_Definition__c where Name = :context.tableSelection.tableSelected];
-             
-             if (ID != null)
-             {
-                 String userIdentifier = UserInfo.getUserName();
-                 if (ID.Integration_User__c)
-                     userIdentifier = ID.Integration_Target__r.Integration_User__c;
-                 
-                 List<Integration_Input__c> IIs = [select Id, Name, Type__c from Integration_Input__c where Integration_Definition__c = :ID.Id  order by Sequence__c];
-                 
-                 String URI = 'callout:' + ID.Integration_Target__r.Named_Credentials__c + '/'  + ID.URL_Method__c;
-                 
-                 String RecordIdentifierName = '';
-                 String RecordIdentifierValue = '';
-                 String QueryParameters = '';
-               
-       
-                 for (Integration_Input__c II : IIs)
-                 {
-                     System.Debug('Searching for ' + II.Name);
-                     if (context.tableSelection.filter.columnName == II.Name)
-                     {
-                         if (II.Type__c == 'Query Parameter')
-                            QueryParameters += '&' + II.Name + '=' + EncodingUtil.urlEncode((String)context.tableSelection.filter.columnValue,'UTF-8');
-                         else if (II.Type__c == 'URI')
-                             URI += '/' + EncodingUtil.urlEncode((String)context.tableSelection.filter.columnValue,'UTF-8');
-                           
-                         RecordIdentifierName = II.Name;
-                         RecordIdentifierValue = (String)context.tableSelection.filter.columnValue;
-                     }
+         	Map<String,Object> IntStruct = RESTCallout_V2.LoadIntegrationStructure(context.tableSelection.tableSelected);
+            System.Debug('After def load');
+         	System.Debug(JSON.serialize(IntStruct));
+         	Map<String,Object> IntDef = (Map<String,Object>)IntStruct.get(context.tableSelection.tableSelected);
+         	
+         	System.Debug(JSON.serialize(IntDef));
+         	Map<String,Object> DataObject = new Map<String,Object>();
+         	HttpRequest req = new HttpRequest();
+         	
+         	DataObject.put(context.tableSelection.filter.columnName,context.tableSelection.filter.columnValue );
+         	RecordIdentifierName = context.tableSelection.filter.columnName;
+            RecordIdentifierValue = (String)context.tableSelection.filter.columnValue;
+     
+         	List<DataSource.Filter> SubFilters = context.tableSelection.filter.subfilters;
+         	
+         	if (SubFilters != null && !SubFilters.isEmpty())
+         	{
+         		for (DataSource.Filter f : SubFilters)
+                {
+                	DataObject.put(f.columnName, f.columnValue);
+                	RecordIdentifierName = f.columnName;
+                    RecordIdentifierValue = (String)f.columnValue;
+                }
+         	}
+         	
+         	RESTCallout_V2.PrepareInput(IntDef, DataObject, req);
+ 
+ 			if (RecordIdentifierName != '')
+ 			{
+            	req.setMethod('GET');
+            	Http http = new Http();
+            	HTTPResponse res = http.send(req);
                      
-                     List<DataSource.Filter> SubFilters = context.tableSelection.filter.subfilters;
-                     
-                     
-                     
-                     if (SubFilters != null && !SubFilters.isEmpty())
-                     {
-                         for (DataSource.Filter f : SubFilters)
-                         {
-                             
-                             if (f.columnName == II.Name)
-                             {
-                                 SYstem.Debug('Type: ' + II.Type__c);
-                                 if (II.Type__c == 'Query Parameter')
-                                     QueryParameters += '&' + II.Name + '=' + EncodingUtil.urlEncode((String)f.columnValue,'UTF-8');
-                                 else if (II.Type__c == 'URI')
-                                     URI += '/' + EncodingUtil.urlEncode((String)f.columnValue,'UTF-8');
-                                 RecordIdentifierName = II.Name;
-                                 RecordIdentifierValue = (string)f.columnValue;
-                             }
-                         }
-                     }
-                 }
-                 if (ID.Integration_Target__r.User_Field_Name__c != null && QueryParameters.length() > 0)
-                     URI += '?' + ID.Integration_Target__r.User_Field_Name__c + '=' + userIdentifier + QueryParameters;
-                 else if (QueryParameters.length() > 0)
-                 {
-                     URI += '?' + QueryParameters.substring(1);
-                 }
-                 
-                 System.debug('URI: ' + URI);
-                 
-                 if (RecordIdentifierName != '')
-                 {
-                     System.Debug('URI: ' + URI);
-                     System.Debug(RecordIdentifierName + ': ' + RecordIdentifierValue);
-                     String outboundContentJson = Json.serialize(outboundContentMap);
-                     HttpRequest req = new HttpRequest();
-                   
-                     req.setEndpoint(URI);
-                     System.debug('EndPoint: ' + req.getEndpoint());
-                     //req.setBody(outboundContentJson);
-                     req.setMethod('GET');
-                     Http http = new Http();
-                     HTTPResponse res = http.send(req);
-                     
-                     System.debug('Statuscode: ' + res.getStatusCode());
+            	System.debug('Statuscode: ' + res.getStatusCode());
                         
-                     // Test to see if the call was succesfull 
-                     if (res.getStatusCode() == 200 || res.getStatusCode() == 201)
+                // Test to see if the call was succesfull 
+                if (res.getStatusCode() == 200 || res.getStatusCode() == 201)
+                {
+                     System.debug('Call was succesful');
+                     System.debug('Return JSON: ' + res.getBody());
+                     System.debug('Body size: ' + res.getBody().length() );
+                     
+                     List<Object> Children;
+                  	 Map<String,Object> SingleChild;
+                    
+                     if (IntDef.get(RESTCallout_V2.STRUCTURE_COLLECTION) == null || IntDef.get(RESTCallout_V2.STRUCTURE_COLLECTION) == '')
                      {
-                         System.debug('Call was succesful');
-                         System.debug('Return JSON: ' + res.getBody());
-                         System.debug('Body size: ' + res.getBody().length() );
-                         
-                          /*Write Log
-                            Integration_Log__c IL = new Integration_Log__c();
-                            
-                            IL.Name = context.tableSelection.tableSelected;
-                            IL.Integration_Id__c = RecordIdentifierValue;
-                            IL.Output_Message__c = res.getBody();
-                            IL.Status_Code__c = res.getStatusCode();
-                            Insert IL;*/
-        
-                         List<Object> Children;
-                      
-                         if (ID.Collection_Name__c == null || ID.Collection_Name__c == '')
-                         {
-                             System.Debug('Empty collection name');
-                              Children = (List<Object>)Json.deserializeUntyped(res.getBody());
-                             
-                         }
+                         System.Debug('Empty collection name');
+                         if (res.getBody().indexOf('[') == 0)
+                          	Children = (List<Object>)Json.deserializeUntyped(res.getBody());
                          else
                          {
-                             Map<String, Object> resultBody = (Map<String, Object>)Json.deserializeUntyped(res.getBody());
-                    
-                             if (ID.Collection_Name__c.indexOf('.') > 0)
-                             {
-                                 System.Debug('Geneste collection;');
-                                 String[] Collections = ID.Collection_Name__c.Split('\\.');
-                                 
-                                 if (resultBody.containsKey(Collections[0]))
-                                 {
-                                     System.Debug('toplevel gevonden');
-                                     Map<String, Object> Temp = (Map<String,Object>)resultBody.get(Collections[0]);
-                                           
-                                     for (Integer j = 1; j < Collections.size(); j++)
-                                     {
-                                         System.Debug('Level ' + j + ', ' + Collections[j]);
-                                         if (j < Collections.size() -1)
-                                         {
-                                            Temp = (Map<String,Object>)resultBody.get(Collections[0]);
-                                         }
-                                         else
-                                         {
-                                             Children = (List<Object>)Temp.get(Collections[j]);
-                                         }
-                                         
-                                     }
-                                 }
-                             }
-                             else if (resultBody.containsKey(ID.Collection_Name__c))
-                             {    
-                                 System.Debug('Collection name: ' + ID.Collection_Name__c);
-                                 Children = (List<Object>)resultBody.get(ID.Collection_Name__c);
-                              }
+                             SingleChild = (Map<String,Object>)Json.deserializeUntyped(res.getBody());
+                             Children = new List<Object>{ SingleChild };
                          }
                          
-                         if (Children != null && !Children.isEmpty())
+                     }
+                     else
+                     {
+                         Map<String, Object> resultBody = (Map<String, Object>)Json.deserializeUntyped(res.getBody());
+                
+                         if (((String)IntDef.get(RESTCallout_V2.STRUCTURE_COLLECTION)).indexOf('.') > 0)
                          {
-                             System.debug('There are children');
-                             System.debug(Children);
-                             List<Integration_Output__c> IOs = [select Name, External_Id__c, Field_Type__c from Integration_Output__c where Integration_Definition__c = :ID.Id];
+                             System.Debug('Geneste collection;');
+                             String[] Collections = ((String)IntDef.get(RESTCallout_V2.STRUCTURE_COLLECTION)).Split('\\.');
                              
-                             for (Object child : Children)
+                             if (resultBody.containsKey(Collections[0]))
                              {
-                                 Map<String, Object> childMap = (Map<String,Object>)child;
-                                 
-                                 Map<String, Object> row = new Map<String, Object>();
-                                 
-                                 row.put('DisplayUrl','');
-                                 
-                                 for (Integration_Output__c IO : IOs)
+                                 System.Debug('toplevel gevonden');
+                                 Map<String, Object> Temp = (Map<String,Object>)resultBody.get(Collections[0]);
+                                       
+                                 for (Integer j = 1; j < Collections.size(); j++)
                                  {
-                                     if (IO.Name.indexOf('.') != -1)
+                                     System.Debug('Level ' + j + ', ' + Collections[j]);
+                                     if (j < Collections.size() -1)
                                      {
-                                         String[] FieldInfo = IO.Name.Split('\\.');
-                                         Map<String,Object> grandchild = (Map<String,Object>)childMap.get(FieldInfo[0]);
-                                         
-                                         SetFieldValue(row, IO.Name, grandchild.get(FieldInfo[1]), IO.Field_Type__c);
-                                        
-                                         if (IO.External_Id__c)
+                                        Temp = (Map<String,Object>)resultBody.get(Collections[0]);
+                                     }
+                                     else
+                                     {
+                                         if (JSON.serialize(Temp.get(Collections[j])).indexOf('[') == 0)
+                                         	Children = (List<Object>)Temp.get(Collections[j]);
+                                         else
                                          {
-                                             row.put('ExternalId', grandchild.get(FieldInfo[1]));
-                                             System.debug('External Id: (' + IO.Name + ')' + row.get('ExternalId'));
+                                             SingleChild = (Map<String,Object>)Temp.get(Collections[j]);
+                                             Children = new List<Object>{SingleChild};
                                          }
                                      }
-                                     else 
-                                     {
-                                        SetFieldValue(row, IO.Name, childMap.get(IO.Name), IO.Field_Type__c);
-                                         
-                                         if (IO.External_Id__c)
-                                         {
-                                             row.put('ExternalId', childMap.get(IO.Name));
-                                             System.debug('External Id: (' + IO.Name + ')' + row.get('ExternalId'));
-                                         }
-                                     }
-                                     
                                      
                                  }
-                                 System.Debug(RecordIdentifierName + ': ' + RecordIdentifierValue);
-                                 row.put(RecordIdentifierName, RecordIdentifierValue);
-                                 rows.add(row);
-                                 
                              }
                          }
-                      }
-                 }
-                 
-                 
+                         else if (resultBody.containsKey((String)IntDef.get(RESTCallout_V2.STRUCTURE_COLLECTION)))
+                         {    
+                             System.Debug('Collection name: ' + IntDef.get(RESTCallout_V2.STRUCTURE_COLLECTION));
+                             if (JSON.serialize(resultBody.get((String)IntDef.get(RESTCallout_V2.STRUCTURE_COLLECTION))).indexOf('[') == 0)
+                             	Children = (List<Object>)resultBody.get((String)IntDef.get(RESTCallout_V2.STRUCTURE_COLLECTION));
+                             else
+                             {
+                                 SingleChild = (Map<String,Object>)resultBody.get((String)IntDef.get(RESTCallout_V2.STRUCTURE_COLLECTION));
+                                 Children = new List<Object>{SingleChild};
+                             }
+                          }
+                     }
+                     
+                     if (Children != null && !Children.isEmpty())
+                     {
+                         System.debug('There are children');
+                         System.debug(Children);
+                          
+                         for (Object child : Children)
+                         {
+                             Map<String, Object> childMap = (Map<String,Object>)child;
+                             
+                             Map<String, Object> row = new Map<String, Object>();
+                             
+                             row.put('DisplayUrl','');
+                             Map<String, Object> OutputArguments = (Map<String,Object>)IntDef.get(RESTCallout_V2.STRUCTURE_OUTPUTS);
+                            List<Object> records = (List<Object>)OutputArguments.get(RESTCallout_V2.STRUCTURE_RECORDS);
+                             
+                             for (Integer J = 0; J < records.size(); J++)
+                             {
+                             	Map<String,Object> record = (Map<String,Object>)records[J];
+                             	
+                                 if (((String)record.get(RESTCallout_V2.STRUCTURE_NAME)).indexOf('.') != -1)
+                                 {
+                                     String[] FieldInfo = ((String)record.get(RESTCallout_V2.STRUCTURE_NAME)).Split('\\.');
+                                     Map<String,Object> grandchild = (Map<String,Object>)childMap.get(FieldInfo[0]);
+                                     
+                                     SetFieldValue(row, ((String)record.get(RESTCallout_V2.STRUCTURE_NAME)), grandchild.get(FieldInfo[1]), (String)record.get(RESTCallout_V2.STRUCTURE_FIELD_TYPE));
+                                    
+                                     if ((Boolean)record.get(RESTCallout_V2.STRUCTURE_EXTERNAL_ID))
+                                     {
+                                         row.put('ExternalId', grandchild.get(FieldInfo[1]));
+                                         System.debug('External Id: (' + ((String)record.get(RESTCallout_V2.STRUCTURE_NAME)) + ')' + row.get('ExternalId'));
+                                     }
+                                 }
+                                 else 
+                                 {
+                                    SetFieldValue(row, ((String)record.get(RESTCallout_V2.STRUCTURE_NAME)), childMap.get(((String)record.get(RESTCallout_V2.STRUCTURE_NAME))), (String)record.get(RESTCallout_V2.STRUCTURE_FIELD_TYPE));
+                                     
+                                     if ((Boolean)record.get(RESTCallout_V2.STRUCTURE_EXTERNAL_ID))
+                                     {
+                                         row.put('ExternalId', childMap.get(((String)record.get(RESTCallout_V2.STRUCTURE_NAME))));
+                                         System.debug('External Id: (' + ((String)record.get(RESTCallout_V2.STRUCTURE_NAME)) + ')' + row.get('ExternalId'));
+                                     }
+                                 }
+                                 
+                                 
+                             }
+                             System.Debug(RecordIdentifierName + ': ' + RecordIdentifierValue);
+                             row.put(RecordIdentifierName, RecordIdentifierValue);
+                             System.Debug(row);
+                             rows.add(row);
+                             
+                         }
+                     }
+                 }           
              }
          }
          return rows;

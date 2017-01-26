@@ -35,6 +35,7 @@ public class RESTCallOut_V2 {
     public static final String STRUCTURE_DATA = 'Data';
     public static final String STRUCTURE_SYNCHRONOUS = 'Synchronous__c';
     Public static final String STRUCTURE_TYPE = 'Type__c';
+    Public static final String STRUCTURE_EXTERNAL_ID = 'External_Id__c';
     
     public static final String ARGUMENT_TYPE_HEADER = 'Header';
     public static final String ARGUMENT_TYPE_URI = 'Uri';
@@ -111,17 +112,13 @@ public class RESTCallOut_V2 {
         }
     }
     
-    // Do the actual REST call for a single data record
-    // 
-    public static Boolean PerformSingleRESTCall(Map<String,Object> IntDef, Map<String,Object> DataRecord)
+    public static void PrepareInput(Map<String,Object> IntDef, Map<String,Object> DataRecord, HttpRequest req)
     {
-        Boolean ReturnValue = false;
-        String URI = 'callout:';
+    	String URI = 'callout:';
+    	String QueryParameters = '';
         Map<String,Object> outboundContentMap = new Map<String,Object>();
-        HttpRequest req = new HttpRequest();
-        String QueryParameters = '';
        
-        Map<String,Object> IntegrationTarget = (Map<String,Object>)IntDef.Get(STRUCTURE_TARGET);
+    	Map<String,Object> IntegrationTarget = (Map<String,Object>)IntDef.Get(STRUCTURE_TARGET);
         URI += (String)IntegrationTarget.get(STRUCTURE_NAMED_CREDENTIALS) + '/';
         URI += (String)IntDef.get(STRUCTURE_URL_METHOD);
         
@@ -244,13 +241,37 @@ public class RESTCallOut_V2 {
             
         }
         
-        URI += '?' + (String)IntegrationTarget.get(STRUCTURE_UID_FIELD) + '=' + userIdentifier + QueryParameters;
+        if (IntegrationTarget.get(STRUCTURE_UID_FIELD) == null)
+        {
+            if (QueryParameters.length() > 0)
+            	URI += '?' + QueryParameters.substring(1);
+    	}
+        else
+        	URI += '?' + (String)IntegrationTarget.get(STRUCTURE_UID_FIELD) + '=' + userIdentifier + QueryParameters;
         System.debug(URI);
         req.setEndpoint(URI);
-        String outboundContentJSON = JSON.serialize(outboundContentMap);
-        System.Debug(outboundContentJSON);
-        req.setBody(outboundContentJSON);
+        if (outboundContentMap.size() > 0)
+        {         
+        	String outboundContentJSON = JSON.serialize(outboundContentMap);
+        	System.Debug(outboundContentJSON);
+        	req.setBody(outboundContentJSON);
+        }
         req.setMethod((String)IntDef.get(STRUCTURE_HTTP_METHOD));
+    	
+    }
+    
+    // Do the actual REST call for a single data record
+    // 
+    public static Boolean PerformSingleRESTCall(Map<String,Object> IntDef, Map<String,Object> DataRecord)
+    {
+        Boolean ReturnValue = false;
+        String URI = 'callout:';
+        HttpRequest req = new HttpRequest();
+        
+        PrepareInput(IntDef, DataRecord, req);
+       
+        
+        
         Http http = new Http();
         HTTPResponse res = http.send(req);
         
@@ -429,7 +450,7 @@ public class RESTCallOut_V2 {
                                                 Integration_Target__r.Namespace__c, 
                                                 (select Name, Field_Name__c, Field_Type__c, Fixed__c, Fixed_Value__c, 
                                                  Type__c from Integration_Inputs__r order by Sequence__c), (
-                                                 select Name, Field_Name__c, Header_Variable__c, Field_Type__c  
+                                                 select Name, Field_Name__c, Header_Variable__c, Field_Type__c, External_Id__c  
                                                      from Integration_Outputs__r order by Sequence__c) 
                                                 from Integration_Definition__c where Name in :Methods];
         if (!IDs.isEmpty())
@@ -440,7 +461,7 @@ public class RESTCallOut_V2 {
             for (Integration_Definition__c ID : IDs)
             {
                 Map<String,Object> IntDef = (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(ID));
-            
+            	System.Debug(ID.Name + ': ' + JSON.serialize(IntDef));
                 IntDef.put(STRUCTURE_IDS, null);
                 CreateObjectQuery(IntDef);
             
@@ -477,13 +498,16 @@ public class RESTCallOut_V2 {
                 
                 if (InputArgument.get(STRUCTURE_FIXED) == false)
                 {
-                    if ((FieldCount > 0) && (Query.indexOf((String)InputArgument.get(STRUCTURE_FIELD_NAME)) == -1))
-                        Query += ',';
+                    if (InputArgument.get(STRUCTURE_FIELD_NAME) != null)
+                    {
+                 	   if ((FieldCount > 0) && (Query.indexOf((String)InputArgument.get(STRUCTURE_FIELD_NAME)) == -1))
+                 	       Query += ',';
                     
-                    if (Query.indexOf((String)InputArgument.get(STRUCTURE_FIELD_NAME)) == -1)
-                    {    
-                        FieldCount++;
-                        Query += InputArgument.get(STRUCTURE_FIELD_NAME);
+                	   if (Query.indexOf((String)InputArgument.get(STRUCTURE_FIELD_NAME)) == -1)
+                 	   {    
+                  	      FieldCount++;
+                  	      Query += InputArgument.get(STRUCTURE_FIELD_NAME);
+                  	   }
                     }
                 }
             }
