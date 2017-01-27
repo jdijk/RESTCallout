@@ -9,6 +9,7 @@ use cases:
 <li>A list of results is retrieved as REST call and shown using an External Object.</li>
 </ol>
 
-<a href="https://githubsfdeploy.herokuapp.com/app/githubdeploy/jdijk/RESTCallout">
-<img src="https://andrewfawcett.files.wordpress.com/2014/09/deploy.png?w=820" />
+<a href="https://githubsfdeploy.herokuapp.com">
+  <img alt="Deploy to Salesforce"
+       src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/deploy.png">
 </a>
