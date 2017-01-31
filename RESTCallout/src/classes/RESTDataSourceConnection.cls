@@ -119,7 +119,7 @@ global class RESTDataSourceConnection extends DataSource.Connection {
               
          if (context.tableSelection.filter != null)
          {
-         	Map<String,Object> IntStruct = RESTCallout_V2.LoadIntegrationStructure(context.tableSelection.tableSelected);
+         	Map<String,Object> IntStruct = RESTCallout.LoadIntegrationStructure(context.tableSelection.tableSelected);
             System.Debug('After def load');
          	System.Debug(JSON.serialize(IntStruct));
          	Map<String,Object> IntDef = (Map<String,Object>)IntStruct.get(context.tableSelection.tableSelected);
@@ -144,7 +144,7 @@ global class RESTDataSourceConnection extends DataSource.Connection {
                 }
          	}
          	
-         	RESTCallout_V2.PrepareInput(IntDef, DataObject, req);
+         	RESTCallout.PrepareInput(IntDef, DataObject, req);
  
  			if (RecordIdentifierName != '')
  			{
@@ -164,7 +164,7 @@ global class RESTDataSourceConnection extends DataSource.Connection {
                      List<Object> Children;
                   	 Map<String,Object> SingleChild;
                     
-                     if (IntDef.get(RESTCallout_V2.STRUCTURE_COLLECTION) == null || IntDef.get(RESTCallout_V2.STRUCTURE_COLLECTION) == '')
+                     if (IntDef.get(RESTCallout.STRUCTURE_COLLECTION) == null || IntDef.get(RESTCallout.STRUCTURE_COLLECTION) == '')
                      {
                          System.Debug('Empty collection name');
                          if (res.getBody().indexOf('[') == 0)
@@ -180,10 +180,10 @@ global class RESTDataSourceConnection extends DataSource.Connection {
                      {
                          Map<String, Object> resultBody = (Map<String, Object>)Json.deserializeUntyped(res.getBody());
                 
-                         if (((String)IntDef.get(RESTCallout_V2.STRUCTURE_COLLECTION)).indexOf('.') > 0)
+                         if (((String)IntDef.get(RESTCallout.STRUCTURE_COLLECTION)).indexOf('.') > 0)
                          {
                              System.Debug('Geneste collection;');
-                             String[] Collections = ((String)IntDef.get(RESTCallout_V2.STRUCTURE_COLLECTION)).Split('\\.');
+                             String[] Collections = ((String)IntDef.get(RESTCallout.STRUCTURE_COLLECTION)).Split('\\.');
                              
                              if (resultBody.containsKey(Collections[0]))
                              {
@@ -211,14 +211,14 @@ global class RESTDataSourceConnection extends DataSource.Connection {
                                  }
                              }
                          }
-                         else if (resultBody.containsKey((String)IntDef.get(RESTCallout_V2.STRUCTURE_COLLECTION)))
+                         else if (resultBody.containsKey((String)IntDef.get(RESTCallout.STRUCTURE_COLLECTION)))
                          {    
-                             System.Debug('Collection name: ' + IntDef.get(RESTCallout_V2.STRUCTURE_COLLECTION));
-                             if (JSON.serialize(resultBody.get((String)IntDef.get(RESTCallout_V2.STRUCTURE_COLLECTION))).indexOf('[') == 0)
-                             	Children = (List<Object>)resultBody.get((String)IntDef.get(RESTCallout_V2.STRUCTURE_COLLECTION));
+                             System.Debug('Collection name: ' + IntDef.get(RESTCallout.STRUCTURE_COLLECTION));
+                             if (JSON.serialize(resultBody.get((String)IntDef.get(RESTCallout.STRUCTURE_COLLECTION))).indexOf('[') == 0)
+                             	Children = (List<Object>)resultBody.get((String)IntDef.get(RESTCallout.STRUCTURE_COLLECTION));
                              else
                              {
-                                 SingleChild = (Map<String,Object>)resultBody.get((String)IntDef.get(RESTCallout_V2.STRUCTURE_COLLECTION));
+                                 SingleChild = (Map<String,Object>)resultBody.get((String)IntDef.get(RESTCallout.STRUCTURE_COLLECTION));
                                  Children = new List<Object>{SingleChild};
                              }
                           }
@@ -236,34 +236,34 @@ global class RESTDataSourceConnection extends DataSource.Connection {
                              Map<String, Object> row = new Map<String, Object>();
                              
                              row.put('DisplayUrl','');
-                             Map<String, Object> OutputArguments = (Map<String,Object>)IntDef.get(RESTCallout_V2.STRUCTURE_OUTPUTS);
-                            List<Object> records = (List<Object>)OutputArguments.get(RESTCallout_V2.STRUCTURE_RECORDS);
+                             Map<String, Object> OutputArguments = (Map<String,Object>)IntDef.get(RESTCallout.STRUCTURE_OUTPUTS);
+                            List<Object> records = (List<Object>)OutputArguments.get(RESTCallout.STRUCTURE_RECORDS);
                              
                              for (Integer J = 0; J < records.size(); J++)
                              {
                              	Map<String,Object> record = (Map<String,Object>)records[J];
                              	
-                                 if (((String)record.get(RESTCallout_V2.STRUCTURE_NAME)).indexOf('.') != -1)
+                                 if (((String)record.get(RESTCallout.STRUCTURE_NAME)).indexOf('.') != -1)
                                  {
-                                     String[] FieldInfo = ((String)record.get(RESTCallout_V2.STRUCTURE_NAME)).Split('\\.');
+                                     String[] FieldInfo = ((String)record.get(RESTCallout.STRUCTURE_NAME)).Split('\\.');
                                      Map<String,Object> grandchild = (Map<String,Object>)childMap.get(FieldInfo[0]);
                                      
-                                     SetFieldValue(row, ((String)record.get(RESTCallout_V2.STRUCTURE_NAME)), grandchild.get(FieldInfo[1]), (String)record.get(RESTCallout_V2.STRUCTURE_FIELD_TYPE));
+                                     SetFieldValue(row, ((String)record.get(RESTCallout.STRUCTURE_NAME)), grandchild.get(FieldInfo[1]), (String)record.get(RESTCallout.STRUCTURE_FIELD_TYPE));
                                     
-                                     if ((Boolean)record.get(RESTCallout_V2.STRUCTURE_EXTERNAL_ID))
+                                     if ((Boolean)record.get(RESTCallout.STRUCTURE_EXTERNAL_ID))
                                      {
                                          row.put('ExternalId', grandchild.get(FieldInfo[1]));
-                                         System.debug('External Id: (' + ((String)record.get(RESTCallout_V2.STRUCTURE_NAME)) + ')' + row.get('ExternalId'));
+                                         System.debug('External Id: (' + ((String)record.get(RESTCallout.STRUCTURE_NAME)) + ')' + row.get('ExternalId'));
                                      }
                                  }
                                  else 
                                  {
-                                    SetFieldValue(row, ((String)record.get(RESTCallout_V2.STRUCTURE_NAME)), childMap.get(((String)record.get(RESTCallout_V2.STRUCTURE_NAME))), (String)record.get(RESTCallout_V2.STRUCTURE_FIELD_TYPE));
+                                    SetFieldValue(row, ((String)record.get(RESTCallout.STRUCTURE_NAME)), childMap.get(((String)record.get(RESTCallout.STRUCTURE_NAME))), (String)record.get(RESTCallout.STRUCTURE_FIELD_TYPE));
                                      
-                                     if ((Boolean)record.get(RESTCallout_V2.STRUCTURE_EXTERNAL_ID))
+                                     if ((Boolean)record.get(RESTCallout.STRUCTURE_EXTERNAL_ID))
                                      {
-                                         row.put('ExternalId', childMap.get(((String)record.get(RESTCallout_V2.STRUCTURE_NAME))));
-                                         System.debug('External Id: (' + ((String)record.get(RESTCallout_V2.STRUCTURE_NAME)) + ')' + row.get('ExternalId'));
+                                         row.put('ExternalId', childMap.get(((String)record.get(RESTCallout.STRUCTURE_NAME))));
+                                         System.debug('External Id: (' + ((String)record.get(RESTCallout.STRUCTURE_NAME)) + ')' + row.get('ExternalId'));
                                      }
                                  }
                                  

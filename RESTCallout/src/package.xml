@@ -5,11 +5,12 @@
         <name>CustomApplication</name>
     </types>
     <types>
-        <members>RESTCallOut_V2</members>
         <members>RESTCalloutMock</members>
         <members>RESTCalloutTest</members>
         <members>RESTDataSourceConnection</members>
         <members>RESTDataSourceProvider</members>
+        <members>RESTCallOut</members>
+        <members>RESTMockService</members>
         <name>ApexClass</name>
     </types>
     <types>
