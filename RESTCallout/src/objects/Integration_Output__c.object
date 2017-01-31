@@ -61,6 +61,18 @@
         <type>Checkbox</type>
     </fields>
     <fields>
+        <fullName>Field_Conversion__c</fullName>
+        <externalId>false</externalId>
+        <label>Field Conversion</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+        <valueSet>
+            <restricted>true</restricted>
+            <valueSetName>Integration_Conversion_Types</valueSetName>
+        </valueSet>
+    </fields>
+    <fields>
         <fullName>Field_Name__c</fullName>
         <externalId>false</externalId>
         <label>Field Name</label>

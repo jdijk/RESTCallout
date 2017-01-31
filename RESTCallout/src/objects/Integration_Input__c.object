@@ -53,6 +53,44 @@
     <enableStreamingApi>true</enableStreamingApi>
     <externalSharingModel>ControlledByParent</externalSharingModel>
     <fields>
+        <fullName>Field_Conversion__c</fullName>
+        <externalId>false</externalId>
+        <label>Field Conversion</label>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Picklist</type>
+        <valueSet>
+            <controllingField>Field_Type__c</controllingField>
+            <restricted>true</restricted>
+            <valueSetName>Integration_Conversion_Types</valueSetName>
+            <valueSettings>
+                <controllingFieldValue>Date</controllingFieldValue>
+                <valueName>Julian Date</valueName>
+            </valueSettings>
+            <valueSettings>
+                <controllingFieldValue>Date</controllingFieldValue>
+                <valueName>DD/MM/YYYY</valueName>
+            </valueSettings>
+            <valueSettings>
+                <controllingFieldValue>Date</controllingFieldValue>
+                <valueName>MM/DD/YYYY</valueName>
+            </valueSettings>
+            <valueSettings>
+                <controllingFieldValue>Date</controllingFieldValue>
+                <controllingFieldValue>Boolean</controllingFieldValue>
+                <valueName>Custom</valueName>
+            </valueSettings>
+            <valueSettings>
+                <controllingFieldValue>Boolean</controllingFieldValue>
+                <valueName>Y/N</valueName>
+            </valueSettings>
+            <valueSettings>
+                <controllingFieldValue>Boolean</controllingFieldValue>
+                <valueName>True/False</valueName>
+            </valueSettings>
+        </valueSet>
+    </fields>
+    <fields>
         <fullName>Field_Name__c</fullName>
         <externalId>false</externalId>
         <label>Field Name</label>

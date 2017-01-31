@@ -117,6 +117,16 @@
         <type>Checkbox</type>
     </fields>
     <fields>
+        <fullName>Mock_Class_Name__c</fullName>
+        <externalId>false</externalId>
+        <label>Mock Class Name</label>
+        <length>50</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Object__c</fullName>
         <externalId>false</externalId>
         <label>Object</label>
@@ -155,6 +165,14 @@
         <unique>false</unique>
     </fields>
     <fields>
+        <fullName>Use_Mock_Class__c</fullName>
+        <defaultValue>false</defaultValue>
+        <externalId>false</externalId>
+        <label>Use Mock Class</label>
+        <trackTrending>false</trackTrending>
+        <type>Checkbox</type>
+    </fields>
+    <fields>
         <fullName>Version__c</fullName>
         <externalId>false</externalId>
         <label>Version</label>
@@ -177,4 +195,10 @@
     <pluralLabel>Integration Definitions</pluralLabel>
     <searchLayouts/>
     <sharingModel>ReadWrite</sharingModel>
+    <validationRules>
+        <fullName>Mock_Class_Name_required_when_Use_Mock</fullName>
+        <active>true</active>
+        <errorConditionFormula>AND(Use_Mock_Class__c = true, Len(Mock_Class_Name__c) = 0)</errorConditionFormula>
+        <errorMessage>You need to enter a Mock Class Name when you select the Use Mock function</errorMessage>
+    </validationRules>
 </CustomObject>
