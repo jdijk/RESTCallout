@@ -1,22 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
     <types>
-        <members>REST_Integration</members>
-        <name>CustomApplication</name>
-    </types>
-    <types>
+        <members>RESTCallOut</members>
         <members>RESTCalloutMock</members>
         <members>RESTCalloutTest</members>
+        <members>RESTDataConversion</members>
         <members>RESTDataSourceConnection</members>
         <members>RESTDataSourceProvider</members>
-        <members>RESTCallOut</members>
+        <members>RESTDateDDMMYYYYConversion</members>
+        <members>RESTDateJulianConversion</members>
+        <members>RESTDateMMDDYYYYConversion</members>
         <members>RESTMockService</members>
         <name>ApexClass</name>
-    </types>
-    <types>
-        <members>Integration_Definition__c</members>
-        <members>Integration_Target__c</members>
-        <name>CustomTab</name>
     </types>
     <types>
         <members>Integration_Definition__c</members>
@@ -24,6 +19,15 @@
         <members>Integration_Output__c</members>
         <members>Integration_Target__c</members>
         <name>CustomObject</name>
+    </types>
+    <types>
+        <members>Integration_Target__c</members>
+        <members>Integration_Definition__c</members>
+        <name>CustomTab</name>
+    </types>
+    <types>
+        <members>REST_Integration</members>
+        <name>CustomApplication</name>
     </types>
     <types>
         <members>Integration_Definition__c-Integration Definition Layout</members>

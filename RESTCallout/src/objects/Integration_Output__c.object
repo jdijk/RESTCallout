@@ -61,6 +61,16 @@
         <type>Checkbox</type>
     </fields>
     <fields>
+        <fullName>Field_Conversion_Custom__c</fullName>
+        <externalId>false</externalId>
+        <label>Field Conversion Custom</label>
+        <length>50</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Field_Conversion__c</fullName>
         <externalId>false</externalId>
         <label>Field Conversion</label>
@@ -68,8 +78,36 @@
         <trackTrending>false</trackTrending>
         <type>Picklist</type>
         <valueSet>
+            <controllingField>Field_Type__c</controllingField>
             <restricted>true</restricted>
             <valueSetName>Integration_Conversion_Types</valueSetName>
+            <valueSettings>
+                <controllingFieldValue>Text</controllingFieldValue>
+                <controllingFieldValue>Number</controllingFieldValue>
+                <controllingFieldValue>Date</controllingFieldValue>
+                <controllingFieldValue>Boolean</controllingFieldValue>
+                <valueName>Custom</valueName>
+            </valueSettings>
+            <valueSettings>
+                <controllingFieldValue>Date</controllingFieldValue>
+                <valueName>Julian Date</valueName>
+            </valueSettings>
+            <valueSettings>
+                <controllingFieldValue>Date</controllingFieldValue>
+                <valueName>DD/MM/YYYY</valueName>
+            </valueSettings>
+            <valueSettings>
+                <controllingFieldValue>Date</controllingFieldValue>
+                <valueName>MM/DD/YYYY</valueName>
+            </valueSettings>
+            <valueSettings>
+                <controllingFieldValue>Boolean</controllingFieldValue>
+                <valueName>Y/N</valueName>
+            </valueSettings>
+            <valueSettings>
+                <controllingFieldValue>Boolean</controllingFieldValue>
+                <valueName>True/False</valueName>
+            </valueSettings>
         </valueSet>
     </fields>
     <fields>
@@ -91,29 +129,7 @@
         <type>Picklist</type>
         <valueSet>
             <restricted>true</restricted>
-            <valueSetDefinition>
-                <sorted>false</sorted>
-                <value>
-                    <fullName>Text</fullName>
-                    <default>false</default>
-                </value>
-                <value>
-                    <fullName>Number</fullName>
-                    <default>false</default>
-                </value>
-                <value>
-                    <fullName>Boolean</fullName>
-                    <default>false</default>
-                </value>
-                <value>
-                    <fullName>Url</fullName>
-                    <default>false</default>
-                </value>
-                <value>
-                    <fullName>Date</fullName>
-                    <default>false</default>
-                </value>
-            </valueSetDefinition>
+            <valueSetName>Integration_Field_Type</valueSetName>
         </valueSet>
     </fields>
     <fields>
@@ -156,4 +172,10 @@
     <pluralLabel>Integration Outputs</pluralLabel>
     <searchLayouts/>
     <sharingModel>ControlledByParent</sharingModel>
+    <validationRules>
+        <fullName>Custom_Field_Conversion</fullName>
+        <active>true</active>
+        <errorConditionFormula>AND(IsPickVal(Field_Conversion__c,&apos;Custom&apos;), Len(Field_Conversion_Custom__c) = 0)</errorConditionFormula>
+        <errorMessage>If you select Custom for he Field Conversion then please specify the class name for the field conversion.</errorMessage>
+    </validationRules>
 </CustomObject>

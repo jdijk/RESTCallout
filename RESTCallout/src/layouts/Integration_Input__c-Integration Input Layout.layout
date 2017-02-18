@@ -16,12 +16,16 @@
                 <field>Field_Name__c</field>
             </layoutItems>
             <layoutItems>
-                <behavior>Edit</behavior>
+                <behavior>Required</behavior>
                 <field>Field_Type__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
                 <field>Field_Conversion__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Field_Conversion_Custom__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>

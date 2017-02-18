@@ -18,6 +18,7 @@ global class RESTDataSourceConnection extends DataSource.Connection {
      **/
    
         override global List<DataSource.Table> sync() {
+           
         List<Integration_Definition__c> PCs = [Select Id, Name, URL_Method__c, Object__c from Integration_Definition__c where External_Object__c = true];
         List<DataSource.Table> tables = new List<DataSource.Table>();        
         
@@ -65,7 +66,9 @@ global class RESTDataSourceConnection extends DataSource.Connection {
             tables.add(
                 DataSource.Table.get(PC.Name, 'Name', columns));
         }
+		
         return tables;
+		
     }
     
     
@@ -109,6 +112,7 @@ global class RESTDataSourceConnection extends DataSource.Connection {
             
          List<Map<String,Object>> rows = new List<Map<String,Object>>();
        
+         
          System.Debug('JVD RESTDataSourceConnection.execQuery');
          System.Debug('JVD Table requested: ' + context.tableSelection.tableSelected);
          System.Debug('JVD Filter' + context.tableSelection.filter);
@@ -128,10 +132,13 @@ global class RESTDataSourceConnection extends DataSource.Connection {
          	Map<String,Object> DataObject = new Map<String,Object>();
          	HttpRequest req = new HttpRequest();
          	
-         	DataObject.put(context.tableSelection.filter.columnName,context.tableSelection.filter.columnValue );
-         	RecordIdentifierName = context.tableSelection.filter.columnName;
-            RecordIdentifierValue = (String)context.tableSelection.filter.columnValue;
-     
+            if (context.tableSelection.filter.columnName != null)
+            {
+         		DataObject.put(context.tableSelection.filter.columnName,context.tableSelection.filter.columnValue );
+         		RecordIdentifierName = context.tableSelection.filter.columnName;
+            	RecordIdentifierValue = (String)context.tableSelection.filter.columnValue;
+            }
+             
          	List<DataSource.Filter> SubFilters = context.tableSelection.filter.subfilters;
          	
          	if (SubFilters != null && !SubFilters.isEmpty())
@@ -143,15 +150,38 @@ global class RESTDataSourceConnection extends DataSource.Connection {
                     RecordIdentifierValue = (String)f.columnValue;
                 }
          	}
-         	
+         	System.Debug(DataObject);
+             
          	RESTCallout.PrepareInput(IntDef, DataObject, req);
  
  			if (RecordIdentifierName != '')
  			{
             	req.setMethod('GET');
-            	Http http = new Http();
-            	HTTPResponse res = http.send(req);
-                     
+                HTTPResponse res;
+        
+                // Decide if we do a real call or call a mock class.
+                if ((Boolean)IntDef.get(RESTCallOut.STRUCTURE_USE_MOCK))
+                {
+                    RESTMockService TheMock;
+                    Type mockType = Type.forName((String)IntDef.get(RESTCallOut.STRUCTURE_MOCK_CLASS));
+                    if (null != mockType)
+                    {
+                        TheMock = (RESTMockService) mockType.newInstance();
+                        res = TheMock.GetMockResponse(IntDef, DataObject);
+                        res.setStatusCode(200);
+                    }
+                    else
+                    {
+                        res = new HTTPResponse();
+                        res.setStatusCode(403);
+                    }
+                }
+                else
+                {
+                    Http http = new Http();
+                    res = http.send(req);
+                }
+                             
             	System.debug('Statuscode: ' + res.getStatusCode());
                         
                 // Test to see if the call was succesfull 
@@ -167,7 +197,7 @@ global class RESTDataSourceConnection extends DataSource.Connection {
                      if (IntDef.get(RESTCallout.STRUCTURE_COLLECTION) == null || IntDef.get(RESTCallout.STRUCTURE_COLLECTION) == '')
                      {
                          System.Debug('Empty collection name');
-                         if (res.getBody().indexOf('[') == 0)
+                         if (res.getBody().trim().indexOf('[') == 0)
                           	Children = (List<Object>)Json.deserializeUntyped(res.getBody());
                          else
                          {
@@ -199,7 +229,7 @@ global class RESTDataSourceConnection extends DataSource.Connection {
                                      }
                                      else
                                      {
-                                         if (JSON.serialize(Temp.get(Collections[j])).indexOf('[') == 0)
+                                         if (JSON.serialize(Temp.get(Collections[j])).trim().indexOf('[') == 0)
                                          	Children = (List<Object>)Temp.get(Collections[j]);
                                          else
                                          {
@@ -214,7 +244,7 @@ global class RESTDataSourceConnection extends DataSource.Connection {
                          else if (resultBody.containsKey((String)IntDef.get(RESTCallout.STRUCTURE_COLLECTION)))
                          {    
                              System.Debug('Collection name: ' + IntDef.get(RESTCallout.STRUCTURE_COLLECTION));
-                             if (JSON.serialize(resultBody.get((String)IntDef.get(RESTCallout.STRUCTURE_COLLECTION))).indexOf('[') == 0)
+                             if (JSON.serialize(resultBody.get((String)IntDef.get(RESTCallout.STRUCTURE_COLLECTION))).trim().indexOf('[') == 0)
                              	Children = (List<Object>)resultBody.get((String)IntDef.get(RESTCallout.STRUCTURE_COLLECTION));
                              else
                              {
@@ -279,6 +309,7 @@ global class RESTDataSourceConnection extends DataSource.Connection {
                  }           
              }
          }
+
          return rows;
      }
     
@@ -313,4 +344,5 @@ global class RESTDataSourceConnection extends DataSource.Connection {
                 row.put(FieldName, false);
         }
     }
+	
 }

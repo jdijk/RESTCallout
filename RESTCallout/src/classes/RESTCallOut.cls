@@ -27,6 +27,7 @@ public class RESTCallOut {
     public static final String STRUCTURE_FIELD_NAME = 'Field_Name__c';
     public static final String STRUCTURE_FIELD_TYPE = 'Field_Type__c';
     public static final String STRUCTURE_FIELD_CONVERSION = 'Field_Conversion__c';
+    public static final String STRUCTURE_FIELD_CONVERSION_CUSTOM = 'Field_Conversion_Custom__c';
     public static final String STRUCTURE_FIXED = 'Fixed__c';
     public static final String STRUCTURE_FIXED_VALUE = 'Fixed_Value__c';
     public static final String STRUCTURE_RECORDS = 'records';
@@ -39,9 +40,10 @@ public class RESTCallOut {
     public static final String STRUCTURE_EXTERNAL_ID = 'External_Id__c';
     public static final String STRUCTURE_USE_MOCK = 'Use_Mock_Class__c';
     public static final String STRUCTURE_MOCK_CLASS = 'Mock_Class_Name__c';
+    public static final String STRUCTURE_EXTERNAL_OBJECT = 'External_Object__c';
     
     public static final String ARGUMENT_TYPE_HEADER = 'Header';
-    public static final String ARGUMENT_TYPE_URI = 'Uri';
+    public static final String ARGUMENT_TYPE_URI = 'URI';
     public static final String ARGUMENT_TYPE_QUERY_PARAMETER = 'Query Parameter';
     public static final String ARGUMENT_TYPE_BODY = 'Body';
   
@@ -51,9 +53,18 @@ public class RESTCallOut {
     public static final String FIELD_TYPE_BOOLEAN_TRUE = 'Yes';
     public static final String FIELD_TYPE_BOOLEAN_FALSE = 'No';
     
+    public static final String FIELD_CONVERSION_CUSTOM = 'Custom';
+    public static final String FIELD_CONVERSION_DATE_JULIAN = 'Julian Date';
+    public static final String FIELD_CONVERSION_DATE_DDMMYYYY = 'DD/MM/YYYY';
+    public static final String FIELD_CONVERSION_DATE_MMDDYYYY = 'MM/DD/YYYY';
+    public static final String FIELD_CONVERSION_BOOLEAN_Y_N = 'Y/N';
+    public static final String FIELD_CONVERSION_BOOLEAN_TRUE_FALSE = 'True/False';
+    
+    
     public static final String HTTP_METHOD_POST = 'POST';
     
     public static final String URL_ENCODING = 'UTF-8';
+    
     //
     // This is the method being called from the Proces Builder    
     //        
@@ -152,11 +163,11 @@ public class RESTCallOut {
                         {
                             String[] FieldNames = ((String)InputRecord.get(STRUCTURE_FIELD_NAME)).split('\\.');
                             Map<String,Object> ChildRecord = (Map<String,Object>)DataRecord.get(FieldNames[0]);
-                            req.setHeader((String)InputRecord.get(STRUCTURE_NAME), GetFieldValue(ChildRecord.get(FieldNames[1]),(String)InputRecord.get(STRUCTURE_FIELD_TYPE), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION)));
+                            req.setHeader((String)InputRecord.get(STRUCTURE_NAME), GetFieldValue(ChildRecord.get(FieldNames[1]),(String)InputRecord.get(STRUCTURE_FIELD_TYPE), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION),(String)InputRecord.Get(STRUCTURE_FIELD_CONVERSION_CUSTOM)));
                             // handle child object
                         }
                         else
-                            req.setHeader((String)InputRecord.get(STRUCTURE_NAME), GetFieldValue(DataRecord.get((String)InputRecord.get(STRUCTURE_FIELD_NAME)), (String)InputRecord.get(STRUCTURE_FIELD_TYPE), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION)));
+                            req.setHeader((String)InputRecord.get(STRUCTURE_NAME), GetFieldValue(DataRecord.get((String)InputRecord.get(STRUCTURE_FIELD_NAME)), (String)InputRecord.get(STRUCTURE_FIELD_TYPE), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION_CUSTOM)));
                     }
                 }
                 else if ((String)InputRecord.get(STRUCTURE_TYPE) == ARGUMENT_TYPE_QUERY_PARAMETER)
@@ -170,10 +181,10 @@ public class RESTCallOut {
                             // handle child object
                             String[] FieldNames = ((String)InputRecord.get(STRUCTURE_FIELD_NAME)).split('\\.');
                             Map<String,Object> ChildRecord = (Map<String,Object>)DataRecord.get(FieldNames[0]);
-                            QueryParameters += '&' + (String)InputRecord.get(STRUCTURE_NAME) + '=' +  EncodingUtil.urlEncode(GetFieldValue(ChildRecord.get(FieldNames[1]),(String)InputRecord.get(STRUCTURE_FIELD_TYPE), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION)), URL_ENCODING);
+                            QueryParameters += '&' + (String)InputRecord.get(STRUCTURE_NAME) + '=' +  EncodingUtil.urlEncode(GetFieldValue(ChildRecord.get(FieldNames[1]),(String)InputRecord.get(STRUCTURE_FIELD_TYPE), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION_CUSTOM)), URL_ENCODING);
                         }
                          else
-                            QueryParameters += '&' +  (String)InputRecord.get(STRUCTURE_NAME) + '=' + EncodingUtil.urlEncode(GetFieldValue(DataRecord.get((String)InputRecord.get(STRUCTURE_FIELD_NAME)),(String)InputREcord.get(STRUCTURE_FIELD_TYPE), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION)), URL_ENCODING);
+                            QueryParameters += '&' +  (String)InputRecord.get(STRUCTURE_NAME) + '=' + EncodingUtil.urlEncode(GetFieldValue(DataRecord.get((String)InputRecord.get(STRUCTURE_FIELD_NAME)),(String)InputREcord.get(STRUCTURE_FIELD_TYPE), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION_CUSTOM) ), URL_ENCODING);
                      }
                 }
                 else if ((String)InputRecord.get(STRUCTURE_TYPE) == ARGUMENT_TYPE_URI)
@@ -187,10 +198,10 @@ public class RESTCallOut {
                             // handle child object
                             String[] FieldNames = ((String)InputRecord.get(STRUCTURE_FIELD_NAME)).split('\\.');
                             Map<String,Object> ChildRecord = (Map<String,Object>)DataRecord.get(FieldNames[0]);
-                            URI += '/' +  EncodingUtil.urlEncode(GetFieldValue(ChildRecord.get(FieldNames[1]),(String)InputRecord.get(STRUCTURE_FIELD_TYPE), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION)), URL_ENCODING);
+                            URI += '/' +  EncodingUtil.urlEncode(GetFieldValue(ChildRecord.get(FieldNames[1]),(String)InputRecord.get(STRUCTURE_FIELD_TYPE), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION_CUSTOM)), URL_ENCODING);
                         }
                         else
-                            URI += '/' + EncodingUtil.urlEncode(GetFieldValue(DataRecord.get((String)InputRecord.get(STRUCTURE_FIELD_NAME)),(String)InputRecord.get(STRUCTURE_FIELD_TYPE), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION)), URL_ENCODING);  
+                            URI += '/' + EncodingUtil.urlEncode(GetFieldValue(DataRecord.get((String)InputRecord.get(STRUCTURE_FIELD_NAME)),(String)InputRecord.get(STRUCTURE_FIELD_TYPE), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION_CUSTOM)), URL_ENCODING);  
                     }
                 }
                 else
@@ -215,11 +226,11 @@ public class RESTCallOut {
                             {
                                 String[] FieldNames = ((String)InputRecord.get(STRUCTURE_FIELD_NAME)).split('\\.');
                                 Map<String,Object> ChildRecord = (Map<String,Object>)DataRecord.get(FieldNames[0]);
-                                Child.put(Names[1], GetFieldValue(ChildRecord.get(FieldNames[1]), (String)InputRecord.get(STRUCTURE_FIELD_TYPE), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION)));
+                                Child.put(Names[1], GetFieldValue(ChildRecord.get(FieldNames[1]), (String)InputRecord.get(STRUCTURE_FIELD_TYPE), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION_CUSTOM)  ));
                                 // handle child object
                             }
                             else
-                                Child.put(Names[1], GetFieldValue(DataRecord.get((String)InputRecord.get(STRUCTURE_FIELD_NAME)), (String)InputRecord.get(STRUCTURE_FIELD_TYPE), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION)));
+                                Child.put(Names[1], GetFieldValue(DataRecord.get((String)InputRecord.get(STRUCTURE_FIELD_NAME)), (String)InputRecord.get(STRUCTURE_FIELD_TYPE), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION),(String)InputRecord.get(STRUCTURE_FIELD_CONVERSION_CUSTOM)  ));
                         }
                     
                     }
@@ -233,11 +244,11 @@ public class RESTCallOut {
                             {
                                 String[] FieldNames = ((String)InputRecord.get(STRUCTURE_FIELD_NAME)).split('\\.');
                                 Map<String,Object> ChildRecord = (Map<String,Object>)DataRecord.get(FieldNames[0]);
-                                outboundContentMap.put((String)InputRecord.get(STRUCTURE_NAME), GetFieldValue(ChildRecord.get(FieldNames[1]), (String)InputRecord.get(STRUCTURE_FIELD_TYPE), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION)));
+                                outboundContentMap.put((String)InputRecord.get(STRUCTURE_NAME), GetFieldValue(ChildRecord.get(FieldNames[1]), (String)InputRecord.get(STRUCTURE_FIELD_TYPE), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION),(String)InputRecord.get(STRUCTURE_FIELD_CONVERSION_CUSTOM)  ));
                                 // handle child object
                             }
                             else
-                                outboundContentMap.put((String)InputRecord.get(STRUCTURE_NAME), GetFieldValue(DataRecord.get((String)InputRecord.get(STRUCTURE_FIELD_NAME)), (String)InputRecord.get(STRUCTURE_FIELD_TYPE), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION)));
+                                outboundContentMap.put((String)InputRecord.get(STRUCTURE_NAME), GetFieldValue(DataRecord.get((String)InputRecord.get(STRUCTURE_FIELD_NAME)), (String)InputRecord.get(STRUCTURE_FIELD_TYPE), (String)InputRecord.get(STRUCTURE_FIELD_CONVERSION),(String)InputRecord.get(STRUCTURE_FIELD_CONVERSION_CUSTOM)  ));
                         }
                         
                     }
@@ -280,6 +291,7 @@ public class RESTCallOut {
        
        	HTTPResponse res;
         
+        // Decide if we do a real call or call a mock class.
         if ((Boolean)IntDef.get(STRUCTURE_USE_MOCK))
         {
         	RESTMockService TheMock;
@@ -388,7 +400,7 @@ public class RESTCallOut {
                     {
                         Map<String,Object> OutputArgument = (Map<String,Object>)OutputArguments[Teller];
                         
-                        UpdateRecord.put((String)OutputArgument.get(STRUCTURE_FIELD_NAME), SetFieldValue((String)DataRecord.get((String)OutputArgument.get(STRUCTURE_FIELD_NAME)), (String)OutputArgument.get(STRUCTURE_FIELD_TYPE), (String)OutputArgument.get(STRUCTURE_FIELD_CONVERSION)));
+                        UpdateRecord.put((String)OutputArgument.get(STRUCTURE_FIELD_NAME), SetFieldValue((String)DataRecord.get((String)OutputArgument.get(STRUCTURE_FIELD_NAME)), (String)OutputArgument.get(STRUCTURE_FIELD_TYPE), (String)OutputArgument.get(STRUCTURE_FIELD_CONVERSION),(String)OutputArgument.get(STRUCTURE_FIELD_CONVERSION_CUSTOM)  ));
                     }
                 } 
                 Records.add(UpdateRecord);
@@ -470,15 +482,15 @@ public class RESTCallOut {
     {
          List<Integration_Definition__c> IDs = [select Id, Name, Synchronous__c, HTTP_Method__c, 
                                                 Version__c, URL_Method__c, Integration_User__c, Use_Mock_Class__c,
-                                                Mock_Class_Name__c,
+                                                Mock_Class_Name__c, External_Object__c,
                                                 Collection_Name__c, Object__c, Integration_Target__r.Name, 
                                                 Integration_Target__r.Integration_User__c, 
                                                 Integration_Target__r.Named_Credentials__c, 
                                                 Integration_Target__r.User_Field_Name__c, 
                                                 Integration_Target__r.Namespace__c, 
-                                                (select Name, Field_Name__c, Field_Type__c, Field_Conversion__c, Fixed__c, Fixed_Value__c, 
+                                                (select Name, Field_Name__c, Field_Type__c, Field_Conversion__c, Field_Conversion_Custom__c, Fixed__c, Fixed_Value__c, 
                                                  Type__c from Integration_Inputs__r order by Sequence__c), (
-                                                 select Name, Field_Name__c, Header_Variable__c, Field_Type__c, Field_Conversion__c, External_Id__c  
+                                                 select Name, Field_Name__c, Header_Variable__c, Field_Type__c, Field_Conversion__c, Field_Conversion_Custom__c, External_Id__c  
                                                      from Integration_Outputs__r order by Sequence__c) 
                                                 from Integration_Definition__c where Name in :Methods];
         if (!IDs.isEmpty())
@@ -492,7 +504,7 @@ public class RESTCallOut {
                 System.Debug(ID.Name + ': ' + JSON.serialize(IntDef));
                 IntDef.put(STRUCTURE_IDS, null);
                 CreateObjectQuery(IntDef);
-            
+            	SetupExternalId(IntDef);
                 returnStructure.put(ID.Name, IntDef);  
             }
         
@@ -505,6 +517,41 @@ public class RESTCallOut {
         }
     }
     
+    
+    //
+    //
+    private static void SetupExternalId(Map<String,Object> IntDef)
+    {
+    	if ((Boolean)IntDef.get(STRUCTURE_EXTERNAL_OBJECT))
+        {
+            Map<String,Object> InputStructure = (Map<String,Object>)IntDef.get(STRUCTURE_INPUTS);
+            Map<String,Object> OutputStructure = (Map<String,Object>)IntDef.get(STRUCTURE_OUTPUTS);
+            if (Integer.valueOf(OutputStructure.get(STRUCTURE_TOTALSIZE)) > 0)
+            {
+                List<Object> Outputs = (List<Object>)OutputStructure.get(STRUCTURE_RECORDS);
+                List<Object> Inputs;
+                if (Integer.valueOf(InputStructure.get(STRUCTURE_TOTALSIZE)) > 0)
+                    Inputs = (List<Object>)InputStructure.get(STRUCTURE_RECORDS);
+                else
+                    Inputs = new List<Object>();
+                
+                for (Integer j=0; j < Outputs.size(); j++)
+                {
+                    Map<String,Object> OutputArgument = (Map<String,Object>) Outputs.get(j);
+                    if ((Boolean)OutputArgument.get(STRUCTURE_EXTERNAL_ID))
+                    {
+                        Map<String,Object> InputArgument = new Map<String,Object>(OutputArgument);
+                        InputArgument.put(STRUCTURE_NAME, 'ExternalId');
+                        InputArgument.put(STRUCTURE_FIELD_NAME, 'ExternalId');
+                        InputArgument.put(STRUCTURE_FIXED, false);
+                        InputArgument.put(STRUCTURE_TYPE, ARGUMENT_TYPE_URI);
+                        Inputs.add(InputArgument);
+                    }
+                }
+                InputStructure.put(STRUCTURE_RECORDS, Inputs);
+            }
+        }
+    }
     //
     // Create the database query for an Integration definition
     // 
@@ -514,7 +561,7 @@ public class RESTCallOut {
         String Query = 'select ';
         
         
-       if (Integer.valueOf(Inputs.get(STRUCTURE_TOTALSIZE)) > 0)
+        if (Integer.valueOf(Inputs.get(STRUCTURE_TOTALSIZE)) > 0)
         {
             //List<Map<String,Object>> Records = (List<Map<String,Object>>)Inputs.get(STRUCTURE_RECORDS);
             List<Object> Records = (List<Object>)Inputs.Get(STRUCTURE_RECORDS);
@@ -575,53 +622,196 @@ public class RESTCallOut {
     //
     // Converts Salesforce values to REST values
     // 
-    public static String GetFieldValue(Object FieldValue, String FieldType, String FieldConversion)
+    public static String GetFieldValue(Object FieldValue, String FieldType, String FieldConversion, String CustomFieldConversion)
     {
-        if (FieldType == FIELD_TYPE_BOOLEAN)
+        System.Debug('GetFieldValue: ' + FieldValue + ', ' + FieldType + ', ' + FieldConversion);
+        
+        if (FieldValue == null)
+            return '';
+        
+        if (FieldConversion == FIELD_CONVERSION_CUSTOM)
         {
-            if (FieldValue == true)
-                return FIELD_TYPE_BOOLEAN_TRUE;
+            RESTDataConversion TheConversion;
+        	Type conversionType = Type.forName(CustomFieldConversion);
+        	if (null != conversionType)
+        	{
+        		TheConversion = (RESTDataConversion) conversionType.newInstance();
+        	    return String.valueOf(TheConversion.SalesforceToExternalFormat(FieldValue));
+        	}
             else
-                return FIELD_TYPE_BOOLEAN_FALSE;
-        }    
-        else if (FieldType == FIELD_TYPE_DATE)
-        {
-            return ((DateTime)FieldValue).format('yyyy-mm-dd') + 'T' + ((DateTime)FieldValue).format('HH:mm:ss.SSS') + 'Z';
+                return null;
         }
         else
-            return (String)FieldValue;
+        {
+            if (FieldType == FIELD_TYPE_BOOLEAN)
+            {
+                if (FieldConversion == FIELD_CONVERSION_BOOLEAN_Y_N)
+                {
+                	if (FieldValue == true)
+                    	return FIELD_TYPE_BOOLEAN_TRUE;
+                	else
+                    	return FIELD_TYPE_BOOLEAN_FALSE;
+                }
+                else if (FieldConversion == FIELD_CONVERSION_BOOLEAN_TRUE_FALSE)
+                {
+                    return String.valueOf(FieldValue);
+                }
+                else
+                    return String.valueOf(FieldValue);
+            }    
+            else if (FieldType == FIELD_TYPE_DATE)
+            {
+                if (FieldConversion == FIELD_CONVERSION_DATE_JULIAN)
+                {
+                    RESTDateJulianConversion JulianDate = new RESTDateJulianConversion();
+                    return String.valueOf(JulianDate.SalesforceToExternalFormat(FieldValue));
+                }
+                else if (FieldConversion == FIELD_CONVERSION_DATE_DDMMYYYY)
+                {
+                    RESTDateDDMMYYYYConversion DateConversion = new RESTDateDDMMYYYYConversion();
+                    return String.valueOf(DateConversion.SalesforceToExternalFormat(FieldValue));
+                }
+                else if (FieldConversion == FIELD_CONVERSION_DATE_MMDDYYYY)
+                {
+                    RESTDateMMDDYYYYConversion DateConversion = new RESTDateMMDDYYYYConversion();
+                    return String.valueOf(DateConversion.SalesforceToExternalFormat(FieldValue));
+                }
+                else
+                    return ((DateTime)FieldValue).format('yyyy-mm-dd') + 'T' + ((DateTime)FieldValue).format('HH:mm:ss.SSS') + 'Z';
+            }
+            else
+                return String.valueOf(FieldValue);
+        }
     }
 
     //
     // Converts the REST values to Salesforce values
     // 
-    private static Object SetFieldValue(String FieldValue, String FieldType, String FieldConversion)
+    private static Object SetFieldValue(String FieldValue, String FieldType, String FieldConversion, String CustomFieldConversion)
     {
-        System.Debug('SetFieldValue: ' + FieldValue + '(' + FieldType + ')');
-        if (FieldType == FIELD_TYPE_BOOLEAN)
+        if (FieldConversion == 'Custom')
         {
-            if (FieldValue == FIELD_TYPE_BOOLEAN_TRUE)
-                return true;
+            RESTDataConversion TheConversion;
+        	Type conversionType = Type.forName(CustomFieldConversion);
+        	if (null != conversionType)
+        	{
+        		TheConversion = (RESTDataConversion) conversionType.newInstance();
+        	    return TheConversion.ExternalFormatToSalesForce(FieldValue);
+        	}
             else
-                return false;
-        }
-        else if (FieldType == FIELD_TYPE_NUMBER)
-            return integer.valueOf(FieldValue);
-        else if (FieldType == FIELD_TYPE_DATE)
-        {
-            // 20161206T100929.831 GMT
-            String sDate = (String)FieldValue;
-            String Year = sDate.substring(0,4);
-            String Month = sDate.substring(4,6);
-            String Day = sDate.substring(6,8);
-            String Hour = sDate.substring(9,11);
-            String Minute = sDate.substring(11,13);
-            String Secs = sDate.substring(13,15);
-            
-            sDate = Year + '-' + Month + '-' + Day + ' ' + Hour + ':' + Minute + ':' + Secs;
-            return Date.valueOf(sDate);
+                return null;
         }
         else
-            return FieldValue;
+        {
+            if (FieldType == FIELD_TYPE_BOOLEAN)
+            {
+                if (FieldConversion == FIELD_CONVERSION_BOOLEAN_Y_N)
+                {
+                    if (FieldValue == FIELD_TYPE_BOOLEAN_TRUE)
+                        return true;
+                    else
+                        return false;
+                }
+                else if (FieldConversion == FIELD_CONVERSION_BOOLEAN_TRUE_FALSE)
+                {
+                    return FieldValue;
+                }
+                else 
+                    return false;
+            }
+            else if (FieldType == FIELD_TYPE_NUMBER)
+                return integer.valueOf(FieldValue);
+            else if (FieldType == FIELD_TYPE_DATE)
+            {
+                if (FieldConversion == FIELD_CONVERSION_DATE_JULIAN)
+                {
+                    RESTDateJulianConversion JulianDate = new RESTDateJulianConversion();
+                    return JulianDate.ExternalFormatToSalesForce(FieldValue);
+                 }
+                else if (FieldConversion == FIELD_CONVERSION_DATE_DDMMYYYY)
+                {
+                    RESTDateDDMMYYYYConversion DateConversion = new RESTDateDDMMYYYYConversion();
+                    return DateConversion.ExternalFormatToSalesforce(FieldValue);
+                }
+                else if (FieldConversion == FIELD_CONVERSION_DATE_MMDDYYYY)
+                {
+                    RESTDateMMDDYYYYConversion DateConversion = new RESTDateMMDDYYYYConversion();
+                    return DateConversion.ExternalFormatToSalesforce(FieldValue);
+                }
+                else
+                {
+                    // 20161206T100929.831 GMT
+                    String sDate = (String)FieldValue;
+                    String Year = sDate.substring(0,4);
+                    String Month = sDate.substring(4,6);
+                    String Day = sDate.substring(6,8);
+                    String Hour = sDate.substring(9,11);
+                    String Minute = sDate.substring(11,13);
+                    String Secs = sDate.substring(13,15);
+                    
+                    sDate = Year + '-' + Month + '-' + Day + ' ' + Hour + ':' + Minute + ':' + Secs;
+                    return Date.valueOf(sDate);
+                }
+               
+            }
+            else
+                return FieldValue;
+        }
     }
+    
+    // Converts Salesforce Date object to Julian Date
+    public static Double getJulianDate(DateTime theDate)
+    {
+        
+        System.debug(theDate.day() + '-' + theDate.month() + '-' + theDate.year() + ' ' + thedate.hour() + ':' + theDate.minute() + ':' + thedate.second());
+        Double a = Math.floor((14-theDate.month())/12);
+        Double y = theDate.year() + 4800 - a;
+        Double m = theDate.month() + 12*a - 3;
+        
+        Double JDN = theDate.day() + Math.floor((153*m + 2)/5) + (365 * y) + Math.floor(y/4) - Math.floor(y/100) + Math.floor(y/400) - 32045;
+        
+        Double hour= theDate.hour();
+        Double minute = theDate.minute();
+        Double second = theDate.second();
+        
+        Double JD = JDN + ((hour-12)/24) + (minute/1440) + (second/86400);
+        return JD;
+     }
+    
+    
+    // Converts from JulianDate to Salesforce Date object
+    public static DateTime setJulianDate(Double JulianDate)
+    {
+        Integer JDN = (Integer)Math.floor(JulianDate);
+        Integer f = (Integer)(JDN + 1401 + Math.floor((Math.floor((4 * JDN + 274277) / 146097) * 3) / 4) -38);
+        Integer e = 4 * f + 3;
+        Integer g = (Integer)(Math.floor(Math.mod(e, 1461) / 4));
+        Integer h = 5 * g + 2;
+        Integer Day = (Integer)(Math.floor(Math.mod(h, 153) / 5) + 1);
+        Integer Month = (Integer)(Math.mod((Integer)(Math.floor(h/153)+2),12) + 1);
+        Integer Year = (Integer)(Math.floor(e / 1461) - 4716 + Math.floor((12+2-Month)/12));
+        
+        DateTime ReturnDate = DateTime.newInstance(Year, Month, Day);
+        
+		Double DayFraction = JulianDate - JDN;
+        
+        if (DayFraction >= 0.5)
+        {
+            ReturnDate.addDays(1);
+            DayFraction -= 0.5;
+        }
+        Integer Seconds = (Integer)Math.Floor((24 * 60 * 60) * DayFraction);
+        Integer Hours = (Integer)Math.Floor(Seconds /3600);
+        Seconds = Seconds - (3600 * Hours);
+        Integer Minutes = Seconds / 60;
+        Seconds = Seconds - (60 * Minutes);
+        Hours += 12;
+        ReturnDate.addHours(Hours);
+        ReturnDate.addMinutes(Minutes);
+        ReturnDate.addSeconds(Seconds);
+        
+        return DateTime.newInstance(Year, Month, Day, Hours, Minutes, Seconds);
+    }
+
+	
 }

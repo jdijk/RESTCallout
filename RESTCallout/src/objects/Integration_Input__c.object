@@ -53,6 +53,16 @@
     <enableStreamingApi>true</enableStreamingApi>
     <externalSharingModel>ControlledByParent</externalSharingModel>
     <fields>
+        <fullName>Field_Conversion_Custom__c</fullName>
+        <externalId>false</externalId>
+        <label>Field Conversion Custom</label>
+        <length>50</length>
+        <required>false</required>
+        <trackTrending>false</trackTrending>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
         <fullName>Field_Conversion__c</fullName>
         <externalId>false</externalId>
         <label>Field Conversion</label>
@@ -64,6 +74,13 @@
             <restricted>true</restricted>
             <valueSetName>Integration_Conversion_Types</valueSetName>
             <valueSettings>
+                <controllingFieldValue>Text</controllingFieldValue>
+                <controllingFieldValue>Number</controllingFieldValue>
+                <controllingFieldValue>Date</controllingFieldValue>
+                <controllingFieldValue>Boolean</controllingFieldValue>
+                <valueName>Custom</valueName>
+            </valueSettings>
+            <valueSettings>
                 <controllingFieldValue>Date</controllingFieldValue>
                 <valueName>Julian Date</valueName>
             </valueSettings>
@@ -74,11 +91,6 @@
             <valueSettings>
                 <controllingFieldValue>Date</controllingFieldValue>
                 <valueName>MM/DD/YYYY</valueName>
-            </valueSettings>
-            <valueSettings>
-                <controllingFieldValue>Date</controllingFieldValue>
-                <controllingFieldValue>Boolean</controllingFieldValue>
-                <valueName>Custom</valueName>
             </valueSettings>
             <valueSettings>
                 <controllingFieldValue>Boolean</controllingFieldValue>
@@ -104,30 +116,12 @@
         <fullName>Field_Type__c</fullName>
         <externalId>false</externalId>
         <label>Field Type</label>
-        <required>false</required>
+        <required>true</required>
         <trackTrending>false</trackTrending>
         <type>Picklist</type>
         <valueSet>
             <restricted>true</restricted>
-            <valueSetDefinition>
-                <sorted>false</sorted>
-                <value>
-                    <fullName>Text</fullName>
-                    <default>true</default>
-                </value>
-                <value>
-                    <fullName>Number</fullName>
-                    <default>false</default>
-                </value>
-                <value>
-                    <fullName>Date</fullName>
-                    <default>false</default>
-                </value>
-                <value>
-                    <fullName>Boolean</fullName>
-                    <default>false</default>
-                </value>
-            </valueSetDefinition>
+            <valueSetName>Integration_Field_Type</valueSetName>
         </valueSet>
     </fields>
     <fields>
@@ -210,6 +204,12 @@
     <pluralLabel>Integration Inputs</pluralLabel>
     <searchLayouts/>
     <sharingModel>ControlledByParent</sharingModel>
+    <validationRules>
+        <fullName>Custom_Field_Conversion</fullName>
+        <active>true</active>
+        <errorConditionFormula>AND(IsPickVal(Field_Conversion__c,&apos;Custom&apos;), Len(Field_Conversion_Custom__c) = 0)</errorConditionFormula>
+        <errorMessage>If you select Custom for the FIeld Conversion then you need to enter the name of the class that does the conversion.</errorMessage>
+    </validationRules>
     <validationRules>
         <fullName>If_Fixed_then_Fixed_Value_is_required</fullName>
         <active>true</active>
