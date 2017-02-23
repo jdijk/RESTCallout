@@ -278,7 +278,7 @@ global class RESTDataSourceConnection extends DataSource.Connection {
                                      String[] FieldInfo = ((String)record.get(RESTCallout.STRUCTURE_NAME)).Split('\\.');
                                      Map<String,Object> grandchild = (Map<String,Object>)childMap.get(FieldInfo[0]);
                                      
-                                     SetFieldValue(row, ((String)record.get(RESTCallout.STRUCTURE_NAME)), grandchild.get(FieldInfo[1]), (String)record.get(RESTCallout.STRUCTURE_FIELD_TYPE));
+                                     SetFieldValue(row, ((String)record.get(RESTCallout.STRUCTURE_NAME)), grandchild.get(FieldInfo[1]), (String)record.get(RESTCallout.STRUCTURE_FIELD_TYPE),(String)record.get(RESTCallout.STRUCTURE_FIELD_CONVERSION), (String)record.get(RESTCallout.STRUCTURE_FIELD_CONVERSION_CUSTOM));
                                     
                                      if ((Boolean)record.get(RESTCallout.STRUCTURE_EXTERNAL_ID))
                                      {
@@ -288,7 +288,7 @@ global class RESTDataSourceConnection extends DataSource.Connection {
                                  }
                                  else 
                                  {
-                                    SetFieldValue(row, ((String)record.get(RESTCallout.STRUCTURE_NAME)), childMap.get(((String)record.get(RESTCallout.STRUCTURE_NAME))), (String)record.get(RESTCallout.STRUCTURE_FIELD_TYPE));
+                                    SetFieldValue(row, ((String)record.get(RESTCallout.STRUCTURE_NAME)), childMap.get(((String)record.get(RESTCallout.STRUCTURE_NAME))), (String)record.get(RESTCallout.STRUCTURE_FIELD_TYPE),(String)record.get(RESTCallout.STRUCTURE_FIELD_CONVERSION), (String)record.get(RESTCallout.STRUCTURE_FIELD_CONVERSION_CUSTOM));
                                      
                                      if ((Boolean)record.get(RESTCallout.STRUCTURE_EXTERNAL_ID))
                                      {
@@ -314,8 +314,12 @@ global class RESTDataSourceConnection extends DataSource.Connection {
      }
     
     
-    private void SetFieldValue(Map<String, Object> row, String FieldName, Object FieldValue, String FieldType)
+    private void SetFieldValue(Map<String, Object> row, String FieldName, Object FieldValue, String FieldType, String FieldConversion, String CustomFieldConversion)
     {
+    	
+    	row.put(FieldName, RESTCallOut.SetFieldValue((String)FieldValue, FieldType, FieldConversion, CustomFieldConversion));
+    	
+    	/*
         if (FieldType == 'Text')
             row.put(FieldName, FieldValue);
         else if (FieldType == 'Url')
@@ -343,6 +347,7 @@ global class RESTDataSourceConnection extends DataSource.Connection {
             else
                 row.put(FieldName, false);
         }
+        */
     }
 	
 }

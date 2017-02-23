@@ -686,6 +686,7 @@ public class RESTCallOut {
 
     //
     // Converts the REST values to Salesforce values
+    // This one is also called form the DataSourceConnection
     // 
     public static Object SetFieldValue(String FieldValue, String FieldType, String FieldConversion, String CustomFieldConversion)
     {
