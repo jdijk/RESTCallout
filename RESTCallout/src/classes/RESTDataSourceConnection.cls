@@ -315,39 +315,9 @@ global class RESTDataSourceConnection extends DataSource.Connection {
     
     
     private void SetFieldValue(Map<String, Object> row, String FieldName, Object FieldValue, String FieldType, String FieldConversion, String CustomFieldConversion)
-    {
-    	
+    {	
     	row.put(FieldName, RESTCallOut.SetFieldValue((String)FieldValue, FieldType, FieldConversion, CustomFieldConversion));
     	
-    	/*
-        if (FieldType == 'Text')
-            row.put(FieldName, FieldValue);
-        else if (FieldType == 'Url')
-            row.put(FieldName, FieldValue);
-        else if (FieldType == 'Number')
-            row.put(FieldName, integer.valueOf(FieldValue));
-        else if (FieldType == 'Date')
-        {
-            // 20161206T100929.831 GMT
-            String sDate = (String)FieldValue;
-            String Year = sDate.substring(0,4);
-            String Month = sDate.substring(4,6);
-            String Day = sDate.substring(6,8);
-            String Hour = sDate.substring(9,11);
-            String Minute = sDate.substring(11,13);
-            String Secs = sDate.substring(13,15);
-            
-            sDate = Year + '-' + Month + '-' + Day + ' ' + Hour + ':' + Minute + ':' + Secs;
-            row.put(FieldName, Date.valueOf(sDate));
-        }
-        else if (FIeldType == 'Boolean')
-        {
-            if (FieldValue == 'true')
-                row.put(FieldName, true);
-            else
-                row.put(FieldName, false);
-        }
-        */
     }
 	
 }
