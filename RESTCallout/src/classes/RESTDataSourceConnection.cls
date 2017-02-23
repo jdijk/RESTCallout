@@ -154,8 +154,8 @@ global class RESTDataSourceConnection extends DataSource.Connection {
              
          	RESTCallout.PrepareInput(IntDef, DataObject, req);
  
- 			if (RecordIdentifierName != '')
- 			{
+ 			//if (RecordIdentifierName != '')
+ 			//{
             	req.setMethod('GET');
                 HTTPResponse res;
         
@@ -308,7 +308,7 @@ global class RESTDataSourceConnection extends DataSource.Connection {
                      }
                  }           
              }
-         }
+         //}
 
          return rows;
      }
