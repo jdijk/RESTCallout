@@ -316,7 +316,7 @@ global class RESTDataSourceConnection extends DataSource.Connection {
     
     private void SetFieldValue(Map<String, Object> row, String FieldName, Object FieldValue, String FieldType, String FieldConversion, String CustomFieldConversion)
     {	
-    	row.put(FieldName, RESTCallOut.SetFieldValue((String)FieldValue, FieldType, FieldConversion, CustomFieldConversion));
+    	row.put(FieldName, RESTCallOut.SetFieldValue( String.valueOf(FieldValue), FieldType, FieldConversion, CustomFieldConversion));
     	
     }
 	
