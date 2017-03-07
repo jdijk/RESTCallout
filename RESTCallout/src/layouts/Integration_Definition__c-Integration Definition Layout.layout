@@ -17,11 +17,15 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>External_Object__c</field>
+                <field>URL_Method__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Required</behavior>
                 <field>HTTP_Method__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>External_Object__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
@@ -42,10 +46,6 @@
             <layoutItems>
                 <behavior>Edit</behavior>
                 <field>Synchronous__c</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Edit</behavior>
-                <field>URL_Method__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
