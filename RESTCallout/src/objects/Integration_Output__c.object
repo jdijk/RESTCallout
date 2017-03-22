@@ -124,7 +124,7 @@
         <fullName>Field_Type__c</fullName>
         <externalId>false</externalId>
         <label>Field Type</label>
-        <required>false</required>
+        <required>true</required>
         <trackTrending>false</trackTrending>
         <type>Picklist</type>
         <valueSet>

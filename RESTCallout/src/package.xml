@@ -36,5 +36,9 @@
         <members>Integration_Target__c-Integration Target Layout</members>
         <name>Layout</name>
     </types>
+    <types>
+        <members>REST_Integration_Framework</members>
+        <name>PermissionSet</name>
+    </types>
     <version>38.0</version>
 </Package>
