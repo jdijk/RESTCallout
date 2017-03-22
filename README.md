@@ -47,6 +47,10 @@ Next create a second Picklist Value Set named 'Integration Field Type' and give 
        src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/deploy.png">
 </a>
 
+<h3>3. Assing Permission Set to relevant user</h3>
+
+<p>Assign the 'REST Integration Framework' permission set to a relevant user in your org.</p>
+
 <h2>Desclaimer</h2>
 
 <p>
